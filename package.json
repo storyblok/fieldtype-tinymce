@@ -25,6 +25,7 @@
     "npm-run-all": "^1.6.0",
     "uglify-js": "^2.5.0",
     "vueify": "^8.5.2",
+    "ecstatic": "~>2.0.0",
     "watchify": "^3.4.0"
   },
   "browserify": {
