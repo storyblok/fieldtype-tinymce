@@ -36,7 +36,7 @@ exports.default = {
   methods: {
     initWith: function initWith() {
       return {
-        plugin: 'tiny',
+        plugin: 'storyblok-tinymce',
         content: ''
       };
     },

@@ -33,7 +33,7 @@ export default {
   methods: {
     initWith() {
       return {
-        plugin: 'tiny',
+        plugin: 'storyblok-tinymce',
         content: ''
       }
     },
