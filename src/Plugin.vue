@@ -1,10 +1,14 @@
 <template>
   <div>
-    <textarea v-model="model.content" class="uk-width-1-1 js-textarea"></textarea>
+    <div v-if="tinyLoaded">
+      <plugin-mce :value="model.content" @input="handleInput" :config="config"></plugin-mce>
+    </div>
   </div>
 </template>
 
 <script>
+import PluginMce from './PluginMce.vue';
+
 export default {
   computed: {
     charCount() {
@@ -13,38 +17,37 @@ export default {
   },
   data() {
     return {
-      initialized: false
+      config: {
+        plugins: 'fullscreen link lists code visualblocks',
+        menubar: false,
+        toolbar: 'styleselect | link | numlist bullist | removeformat code',
+        style_formats: [ {title: 'Block', items: [ {title: 'Paragraph', format: 'p'}, {title: 'Header 1', format: 'h1'}, {title: 'Header 2', format: 'h2'}, {title: 'Header 3', format: 'h3'}, {title: 'Header 4', format: 'h4'}, {title: 'Header 5', format: 'h5'}, {title: 'Header 6', format: 'h6'}, {title: 'Blockquote', format: 'blockquote'}, ]}, {title: 'Inline', items: [ {title: 'Bold', icon: 'bold', format: 'bold'}, {title: 'Italic', icon: 'italic', format: 'italic'}, ]}, {title: 'Alignment', items: [ {title: 'Text Right', icon: 'alignright', selector: 'p, div, blockquote', classes: 'text-right'}, {title: 'Text Center', icon: 'aligncenter', selector: 'p, div, blockquote', classes: 'text-center'}, {title: 'Text Left', icon: 'alignleft', selector: 'p, div, blockquote', classes: 'text-left'}, ]}, {title: 'Styles', items: [ {title: 'Text Pink', selector: '*', classes: 'text-pink-carnation'}, ]} ]
+      },
+      tinyLoaded: false
     }
   },
   mixins: [window.Storyblok.plugin],
+  components: {
+    PluginMce
+  },
   methods: {
     initWith() {
       return {
-        plugin: 'storyblok-tinymce',
+        plugin: 'tiny',
         content: ''
       }
     },
     initEditor() {
-      tinymce.init({
-        target: this.$el.querySelector('.js-textarea'),
-        plugins: 'fullscreen link',
-        menubar: false,
-        toolbar: 'undo redo | bold italic | link | fullscreen',
-        init_instance_callback: (editor) => {
-          editor.on('input change undo redo setcontent', () => {
-            this.model.content = editor.getContent()
-          })
-          this.initialized = true
-        }
-      })
-
-      if (this.initialized) {
-        tinymce.get(this.$el.querySelector('.js-textarea').id).setContent(this.model.content)
-      }
+      this.tinyLoaded = true
+    },
+    handleInput(value) {
+      this.model.content = value
     }
   },
   events: {
     'plugin:created'() {
+      this.tinyLoaded = false
+
       if (typeof tinymce !== 'undefined') {
         this.$nextTick(this.initEditor)
       } else {
@@ -52,7 +55,8 @@ export default {
       }
     },
     'plugin:destroyed'() {
-      console.log('plugin:destroyed')
+      window.tinymce.remove()
+      this.tinyLoaded = false
     }
   },
   watch: {
